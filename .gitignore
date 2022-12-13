@@ -1,0 +1,7 @@
+# instalation script (downloaded from the recipe)
+linux-installer.sh
+
+# appimage-builder generated files
+AppDir
+*.AppImage
+appimage-builder-cache
