@@ -11,7 +11,7 @@ jobs:
       run: make
     - name: Get appimagetool
       run: |
-        curl --location -o appimagetool https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage
+        curl --location -o appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
         chmod +x appimagetool
     - name: Make AppImage
       run: ./appimagetool build/calibre.AppDir
