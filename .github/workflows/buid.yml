@@ -18,7 +18,7 @@ jobs:
     - name: Make AppImage
       run: ./appimagetool build/calibre.AppDir
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@master
       with:
         name: Calibre-x86_64.AppImage
         path: ./Calibre-x86_64.AppImage
