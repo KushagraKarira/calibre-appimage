@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Dep
+      run: sudo apt install fuse libfuse2
     - name: Construct AppDir
       run: make
     - name: Get appimagetool
