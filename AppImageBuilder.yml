@@ -59,6 +59,8 @@ AppDir:
     - openssl
     - libsm6
     - libnss3
+    - fuse
+    - libfuse2
     exclude: []
   files:
     exclude:
