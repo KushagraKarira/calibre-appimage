@@ -8,5 +8,5 @@ all:
 	chmod +x build/calibre.AppDir/AppRun
 	mkdir -p build/calibre.AppDir/usr/bin/
 	cd build/calibre.AppDir/usr/bin/ \
-	&& curl -o - https://download.calibre-ebook.com/6.23.0/calibre-6.23.0-x86_64.txz | tar -xJf -
+	&& curl -o - https://download.calibre-ebook.com/6.24.0/calibre-6.24.0-x86_64.txz | tar -xJf -
 	cp build/calibre.AppDir/usr/bin/resources/content-server/calibre.png build/calibre.AppDir
