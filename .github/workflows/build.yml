@@ -14,10 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Install dependency
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y fuse libfuse2
-
+      run: sudo apt-get install -y fuse libfuse2
+      
     - name: Make Calibre AppDir
       run: |
         set -x
