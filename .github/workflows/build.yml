@@ -103,4 +103,4 @@ jobs:
           release_id: ${{ steps.create_release.outputs.id }}
           verbose: true
           draft: false
-          default_release_name: "Calibre $version"
+          default_release_name: $version
