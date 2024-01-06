@@ -38,17 +38,17 @@ jobs:
           MimeType=application/x-mobipocket-ebook;application/epub+zip;x-content/ebook-reader
           Categories=Office;Graphics;Viewer;
           X-GNOME-UsesNotifications=true
-          Actions=Ebook editor;Ebook viewer;LRF viewer;
+          Actions=Ebook-editor;Ebook-viewer;LRF-viewer;
           
-          [Desktop Action Ebook editor]
+          [Desktop Action Ebook-editor]
           Name=Ebook editor
           Exec=ebook-edit %f
           
-          [Desktop Action Ebook viewer]
+          [Desktop Action Ebook-viewer]
           Name=Ebook viewer
           Exec=ebook-viewer %f
           
-          [Desktop Action LRF viewer]
+          [Desktop Action LRF-viewer]
           Name=LRF viewer
           Exec=lrfviewer %f
 
