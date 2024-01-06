@@ -36,21 +36,22 @@ jobs:
           Exec=calibre %F
           Icon=calibre
           MimeType=application/x-mobipocket-ebook;application/epub+zip;x-content/ebook-reader
-          Categories=Office;Graphics;Viewer
+          Categories=Office;Graphics;Viewer;
           X-GNOME-UsesNotifications=true
           Actions=Ebook editor;Ebook viewer;LRF viewer;
-
+          
           [Desktop Action Ebook editor]
           Name=Ebook editor
           Exec=ebook-edit %f
-
+          
           [Desktop Action Ebook viewer]
           Name=Ebook viewer
           Exec=ebook-viewer %f
-
+          
           [Desktop Action LRF viewer]
           Name=LRF viewer
           Exec=lrfviewer %f
+
           EOF
 
           chmod +x build/calibre.AppDir/calibre.desktop
