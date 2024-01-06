@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Calibre
-Comment=E-Book Management
-Exec=calibre %F
-Icon=calibre
-MimeType=application/x-mobipocket-ebook;application/epub+zip;x-content/ebook-reader;
-Categories=Office;Graphics;Viewer;
