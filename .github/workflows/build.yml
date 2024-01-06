@@ -1,4 +1,4 @@
-name: Create new realease
+name: Create new release
 
 on:
   push:
@@ -12,104 +12,94 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: Install dependency
-      run: sudo apt-get install -y fuse libfuse2
-      
-    - name: Make Calibre AppDir
-      run: |
-        set -x
-        version=$(grep -o "Calibre:.*" README.md | cut -d ' ' -f2)
-        echo "Calibre version: $version"
+      - uses: actions/checkout@master
+      - name: Install dependency
+        run: sudo apt-get install -y fuse libfuse2
 
-        #rm -rf build/
-        mkdir -p build/calibre.AppDir/
+      - name: Make Calibre AppDir
+        run: |
+          set -x
+          version=$(grep -o "Calibre:.*" README.md | cut -d ' ' -f2)
+          echo "Calibre version: $version"
 
-        #cp calibre.desktop build/calibre.AppDir/
+          # rm -rf build/
+          mkdir -p build/calibre.AppDir/
 
-        cat > build/calibre.AppDir/calibre.desktop << 'EOF'
-        [Desktop Entry]
-        Type=Application
-        Name=Calibre
-        GenericName=E-book library management
-        Comment=E-book library management: Convert, view, share, catalogue all your e-books
-        Exec=calibre %F
-        Icon=calibre
-        MimeType=application/x-mobipocket-ebook;application/epub+zip;x-content/ebook-reader
-        Categories=Office;Graphics;Viewer
-        X-GNOME-UsesNotifications=true
-        MimeType=application/epub+zip;application/ereader;application/oebps-package+xml;application/pdf;application/vnd.ms-word.document.macroenabled.12;application/vnd.oasis.opendocument.text;application/vnd.openxmlformats-officedocument.wordprocessingml.document;application/x-cb7;application/x-cbc;application/x-cbr;application/x-cbz;application/x-mobi8-ebook;application/x-mobipocket-ebook;application/x-mobipocket-subscription;application/x-ruby;application/x-sony-bbeb;application/xhtml+xml;image/vnd.djvu;text/fb2+xml;text/html;text/plain;text/rtf;text/x-markdown;x-scheme-handler/calibre;
-        ##Define Actions
-        Actions=Ebook editor;Ebook viewer;LRF viewer;
-        
-        [Desktop Action Ebook editor]
-        Name=Ebook editor
-        Exec=ebook-edit %f
-       
-       [Desktop Action Ebook viewer]
-        Name=Ebook viewer
-        Exec=ebook-viewer %f
-        
-        [Desktop Action LRF viewer]
-        Name=LRF viewer
-        Exec=lrfviewer %f
-        EOF
+          # cp calibre.desktop build/calibre.AppDir/
 
-        chmod +x build/calibre.AppDir/calibre.desktop
+          cat > build/calibre.AppDir/calibre.desktop << 'EOF'
+          [Desktop Entry]
+          Type=Application
+          Name=Calibre
+          GenericName=E-book library management
+          Comment=E-book library management: Convert, view, share, catalogue all your e-books
+          Exec=calibre %F
+          Icon=calibre
+          MimeType=application/x-mobipocket-ebook;application/epub+zip;x-content/ebook-reader
+          Categories=Office;Graphics;Viewer
+          X-GNOME-UsesNotifications=true
+          Actions=Ebook editor;Ebook viewer;LRF viewer;
 
-        curl --location -o build/calibre.AppDir/AppRun https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64
-        chmod +x build/calibre.AppDir/AppRun
+          [Desktop Action Ebook editor]
+          Name=Ebook editor
+          Exec=ebook-edit %f
 
-        mkdir -p build/calibre.AppDir/usr/bin/
-        cd build/calibre.AppDir/usr/bin/
-        curl -o - https://download.calibre-ebook.com/$version/calibre-$version-x86_64.txz | tar -xJf -
+          [Desktop Action Ebook viewer]
+          Name=Ebook viewer
+          Exec=ebook-viewer %f
 
-        pwd
-        ls -lah
-        cd ../../../../
-        pwd
-        ls -lah
+          [Desktop Action LRF viewer]
+          Name=LRF viewer
+          Exec=lrfviewer %f
+          EOF
 
-        cp build/calibre.AppDir/usr/bin/resources/content-server/calibre.png build/calibre.AppDir
-        cp README.md build/calibre.AppDir
+          chmod +x build/calibre.AppDir/calibre.desktop
 
-    - name: Get appimagetool
-      run: |
-        set -x
-        wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
-        chmod +x appimagetool-x86_64.AppImage
+          curl --location -o build/calibre.AppDir/AppRun https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64
+          chmod +x build/calibre.AppDir/AppRun
 
-    - name: Make AppImage
-      run:  |
-       set -x
-       ./appimagetool-x86_64.AppImage build/calibre.AppDir
+          mkdir -p build/calibre.AppDir/usr/bin/
+          cd build/calibre.AppDir/usr/bin/
+          curl -o - https://download.calibre-ebook.com/$version/calibre-$version-x86_64.txz | tar -xJf -
 
-    - name: List files and rename AppImage
-      run: |
-        set -x
-        pwd
-        ls -lah
-        version=$(grep -o "Calibre:.*" README.md | cut -d ' ' -f2)
-        echo "Calibre version: $version"
+          pwd
+          ls -lah
+          cd ../../../../
+          pwd
+          ls -lah
 
-        mv Calibre-x86_64.AppImage "Calibre-$version-x86_64.AppImage"
-        md5sum "Calibre-$version-x86_64.AppImage" > "Calibre-$version-x86_64.AppImage.md5"
-        ls -lah
+          cp build/calibre.AppDir/usr/bin/resources/content-server/calibre.png build/calibre.AppDir
+          cp README.md build/calibre.AppDir
 
-    # Build - Errror: Resource not accessible by integration
-    # Change Settings -> Actions -> General -> Workflow Permissions to allow read and write:
-    # https://github.com/actions/first-interaction/issues/10#issuecomment-1506118886
+      - name: Get appimagetool
+        run: |
+          set -x
+          wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
 
-    # https://github.com/marketplace/actions/upload-to-github-release
-    - uses: xresloader/upload-to-github-release@main
-      env:
+      - name: Make AppImage
+        run:  |
+          set -x
+          ./appimagetool-x86_64.AppImage build/calibre.AppDir
+
+      - name: List files and rename AppImage
+        run: |
+          set -x
+          pwd
+          ls -lah
+          version=$(grep -o "Calibre:.*" README.md | cut -d ' ' -f2)
+          echo "Calibre version: $version"
+
+          mv Calibre-x86_64.AppImage "Calibre-$version-x86_64.AppImage"
+          md5sum "Calibre-$version-x86_64.AppImage" > "Calibre-$version-x86_64.AppImage.md5"
+          ls -lah
+
+      - uses: xresloader/upload-to-github-release@main
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
+        with:
           file: "Calibre*.AppImage; Calibre*.md5"
-          #delete_file: "random-name-*.txt;random-*.txt"
           release_id: ${{ steps.create_release.outputs.id }}
-          #overwrite: true
           verbose: true
-          #tags: true
           draft: false
           default_release_name: "Calibre v in AppImage"
