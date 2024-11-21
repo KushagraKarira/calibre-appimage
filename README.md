@@ -1,4 +1,4 @@
 # Calibre Appimage
 
 ## Updated from https://github.com/ryuuzaki42/Calibre_AppImage
-    Calibre: 7.20.0
+    Calibre: 7.21.0
