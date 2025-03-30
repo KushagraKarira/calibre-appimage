@@ -2,19 +2,17 @@ name: Create new release
 
 on:
   push:
-    branches:
-      - "**"
     tags:
-      - "!**"
+      - "v*"
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@master # Use master version
       - name: Install dependency
-        run: sudo apt-get install -y fuse libfuse2
+        run: sudo apt-get update && sudo apt-get install -y fuse libfuse2
 
       - name: Make Calibre AppDir
         run: |
@@ -22,10 +20,7 @@ jobs:
           version=$(grep -o "Calibre:.*" README.md | cut -d ' ' -f2)
           echo "Calibre version: $version"
 
-          # rm -rf build/
           mkdir -p build/calibre.AppDir/
-
-          # cp calibre.desktop build/calibre.AppDir/
 
           cat > build/calibre.AppDir/calibre.desktop << 'EOF'
           [Desktop Entry]
@@ -95,12 +90,21 @@ jobs:
           md5sum "Calibre-$version-x86_64.AppImage" > "Calibre-$version-x86_64.AppImage.md5"
           ls -lah
 
-      - uses: xresloader/upload-to-github-release@main
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@master # Use master version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - uses: xresloader/upload-to-github-release@master # Use master version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file: "Calibre*.AppImage; Calibre*.md5"
           release_id: ${{ steps.create_release.outputs.id }}
           verbose: true
-          draft: false
-          default_release_name: "Calibre v in AppImage"
