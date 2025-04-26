@@ -172,5 +172,7 @@ jobs:
           files: |
             ${{ steps.rename_appimage.outputs.APPIMAGE_NAME }}
             ${{ steps.rename_appimage.outputs.MD5_NAME }}
-          release_id: ${{ steps.create_release.outputs.id }} # Upload to the release created in the previous step
+          # Corrected: Use tag_name to identify the existing release for uploading
+          tag_name: v${{ steps.get_version.outputs.CALIBRE_VERSION }}
+          # Removed: release_id is not a valid input for uploading to an existing release
 
