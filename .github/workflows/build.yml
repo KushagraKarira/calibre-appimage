@@ -56,7 +56,7 @@ jobs:
 
           chmod +x build/calibre.AppDir/calibre.desktop
 
-          curl --location -o build/calibre.AppDir/AppRun https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64
+          curl --location -o build/calibre.AppDir/AppRun https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x build/calibre.AppDir/AppRun
 
           mkdir -p build/calibre.AppDir/usr/bin/
