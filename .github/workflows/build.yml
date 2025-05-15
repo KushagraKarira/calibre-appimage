@@ -146,33 +146,22 @@ jobs:
           # Set the artifact names as step outputs
           echo "APPIMAGE_NAME=$APPIMAGE_NAME" >> $GITHUB_OUTPUT
           echo "MD5_NAME=$MD5_NAME" >> $GITHUB_OUTPUT
-
-
-      - name: Create GitHub Release
-        id: create_release # Assign an ID to access outputs
-        uses: softprops/action-gh-release@v2 # Use a dedicated action for creating releases
+          
+      - name: Create GitHub Release and Upload Assets
+        id: create_release 
+        uses: softprops/action-gh-release@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub Actions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get_version.outputs.CALIBRE_VERSION }} # Use the Calibre version as the tag name (e.g., v6.25.0)
-          name: Calibre AppImage v${{ steps.get_version.outputs.CALIBRE_VERSION }} # Release name
+          tag_name: v${{ steps.get_version.outputs.CALIBRE_VERSION }}
+          name: Calibre AppImage v${{ steps.get_version.outputs.CALIBRE_VERSION }}
           body: |
             Automated build of Calibre AppImage version ${{ steps.get_version.outputs.CALIBRE_VERSION }}.
 
             **Note:** This is an unofficial build.
-          draft: false # Set to true if you want to review before publishing
-          prerelease: false # Set to true for pre-release versions
-
-      - name: Upload AppImage and MD5 to Release
-        uses: softprops/action-gh-release@v2 # Use the same action for uploading assets
-        if: ${{ steps.create_release.outputs.id }} # Only run if the release was created successfully
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: |
+          draft: false
+          prerelease: false
+          files: | 
             ${{ steps.rename_appimage.outputs.APPIMAGE_NAME }}
             ${{ steps.rename_appimage.outputs.MD5_NAME }}
-          # Corrected: Use tag_name to identify the existing release for uploading
-          tag_name: v${{ steps.get_version.outputs.CALIBRE_VERSION }}
-          # Removed: release_id is not a valid input for uploading to an existing release
 
