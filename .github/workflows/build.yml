@@ -1,6 +1,7 @@
 name: Build Calibre AppImage Release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "**" # Trigger on push to any branch
@@ -78,7 +79,7 @@ jobs:
 
           # Download AppRun (runtime for the AppImage)
           # Using a specific release tag for stability
-          curl --location -o build/calibre.AppDir/AppRun https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64
+          curl --location -o build/calibre.AppDir/AppRun https://github.com/AppImage/appimagetool/releases/download/continuous/AppRun-x86_64
           chmod +x build/calibre.AppDir/AppRun
 
           # Create the usr/bin directory inside the AppDir
@@ -113,7 +114,7 @@ jobs:
         run: |
           set -x # Print commands as they are executed for debugging
           # Download the latest appimagetool
-          wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+          wget https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
           # Make it executable
           chmod +x appimagetool-x86_64.AppImage
 
@@ -164,4 +165,3 @@ jobs:
           files: | 
             ${{ steps.rename_appimage.outputs.APPIMAGE_NAME }}
             ${{ steps.rename_appimage.outputs.MD5_NAME }}
-
