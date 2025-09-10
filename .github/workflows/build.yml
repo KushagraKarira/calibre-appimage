@@ -6,7 +6,7 @@ on:
     branches:
       - "**" # Trigger on push to any branch
     tags:
-      - "!**" # Do NOT trigger on tags (releases will be created manually or by another process)
+      - "!**" # Do NOT trigger on tags
 
 jobs:
   build:
@@ -17,131 +17,130 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4 # Use the latest version of the checkout action
 
-        - name: Install dependencies
-    run: |
-      set -euxo pipefail
-      sudo apt-get update
-      sudo apt-get install -y fuse libfuse2
+      - name: Install dependencies
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y fuse libfuse2
 
-    - name: Get Calibre version from README
-    id: get_version
-    run: |
-      set -euxo pipefail
-      VERSION=$(grep -oP "Calibre:\s*\K\S+" README.md)
-      if [ -z "$VERSION" ]; then
-        echo "::error::Could not find Calibre version in README.md. Ensure it has a line like 'Calibre: X.Y.Z'"
-        exit 1
-      fi
-      echo "CALIBRE_VERSION=$VERSION" >> $GITHUB_OUTPUT
+      - name: Get Calibre version from README
+        id: get_version
+        run: |
+          set -euxo pipefail
+          VERSION=$(grep -oP "Calibre:\s*\K\S+" README.md)
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not find Calibre version in README.md. Ensure it has a line like 'Calibre: X.Y.Z'"
+            exit 1
+          fi
+          echo "CALIBRE_VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-  - name: Make Calibre AppDir structure
-    run: |
-      set -euxo pipefail
-      rm -rf build/
-      APPDIR=build/Calibre.AppDir
-      mkdir -p "$APPDIR"
+      - name: Make Calibre AppDir structure
+        run: |
+          set -euxo pipefail
+          rm -rf build/
+          APPDIR=build/Calibre.AppDir
+          mkdir -p "$APPDIR"
 
-      # Desktop file
-      cat > "$APPDIR/calibre.desktop" << 'EOF'
-      [Desktop Entry]
-      Type=Application
-      Name=Calibre
-      GenericName=E-book library management
-      Comment=E-book library management: Convert, view, share, catalogue all your e-books
-      Exec=calibre %F
-      Icon=calibre
-      MimeType=application/x-mobipocket-ebook;application/epub+zip;x-content/ebook-reader
-      Categories=Office;Graphics;Viewer;
-      X-GNOME-UsesNotifications=true
-      Actions=Ebook-editor;Ebook-viewer;LRF-viewer;
-      [Desktop Action Ebook-editor]
-      Name=Ebook editor
-      Exec=ebook-edit %f
-      [Desktop Action Ebook-viewer]
-      Name=Ebook viewer
-      Exec=ebook-viewer %f
-      [Desktop Action LRF-viewer]
-      Name=LRF viewer
-      Exec=lrfviewer %f
-      EOF
+          # Desktop file
+          cat > "$APPDIR/calibre.desktop" << 'EOF'
+          [Desktop Entry]
+          Type=Application
+          Name=Calibre
+          GenericName=E-book library management
+          Comment=E-book library management: Convert, view, share, catalogue all your e-books
+          Exec=calibre %F
+          Icon=calibre
+          MimeType=application/x-mobipocket-ebook;application/epub+zip;x-content/ebook-reader
+          Categories=Office;Graphics;Viewer;
+          X-GNOME-UsesNotifications=true
+          Actions=Ebook-editor;Ebook-viewer;LRF-viewer;
+          [Desktop Action Ebook-editor]
+          Name=Ebook editor
+          Exec=ebook-edit %f
+          [Desktop Action Ebook-viewer]
+          Name=Ebook viewer
+          Exec=ebook-viewer %f
+          [Desktop Action LRF-viewer]
+          Name=LRF viewer
+          Exec=lrfviewer %f
+          EOF
 
-      # AppRun: simple launcher script
-      cat > "$APPDIR/AppRun" << 'EOF'
-      #!/bin/sh
-      HERE="$(dirname "$(readlink -f "$0")")"
-      exec "$HERE/usr/bin/calibre" "$@"
-      EOF
-      chmod +x "$APPDIR/AppRun"
+          # AppRun: simple launcher script
+          cat > "$APPDIR/AppRun" << 'EOF'
+          #!/bin/sh
+          HERE="$(dirname "$(readlink -f "$0")")"
+          exec "$HERE/usr/bin/calibre" "$@"
+          EOF
+          chmod +x "$APPDIR/AppRun"
 
-      # Extract Calibre
-      mkdir -p "$APPDIR/usr/bin"
-      pushd "$APPDIR/usr/bin"
-      CALIBRE_VERSION='${{ steps.get_version.outputs.CALIBRE_VERSION }}'
-      echo "Downloading Calibre $CALIBRE_VERSION"
-      curl -L "https://download.calibre-ebook.com/$CALIBRE_VERSION/calibre-$CALIBRE_VERSION-x86_64.txz" | tar -xJf -
-      popd
+          # Extract Calibre
+          mkdir -p "$APPDIR/usr/bin"
+          pushd "$APPDIR/usr/bin"
+          CALIBRE_VERSION='${{ steps.get_version.outputs.CALIBRE_VERSION }}'
+          echo "Downloading Calibre $CALIBRE_VERSION"
+          curl -L "https://download.calibre-ebook.com/$CALIBRE_VERSION/calibre-$CALIBRE_VERSION-x86_64.txz" | tar -xJf -
+          popd
 
-      # Icon: try common paths
-      if [ -f "$APPDIR/usr/bin/resources/images/apple-touch-icon.png" ]; then
-        cp "$APPDIR/usr/bin/resources/images/apple-touch-icon.png" "$APPDIR/calibre.png"
-      elif [ -f "$APPDIR/usr/bin/resources/content-server/calibre.png" ]; then
-        cp "$APPDIR/usr/bin/resources/content-server/calibre.png" "$APPDIR/calibre.png"
-      else
-        echo "::warning::Icon not found; proceeding without setting a custom icon"
-      fi
+          # Icon: try common paths
+          if [ -f "$APPDIR/usr/bin/resources/images/apple-touch-icon.png" ]; then
+            cp "$APPDIR/usr/bin/resources/images/apple-touch-icon.png" "$APPDIR/calibre.png"
+          elif [ -f "$APPDIR/usr/bin/resources/content-server/calibre.png" ]; then
+            cp "$APPDIR/usr/bin/resources/content-server/calibre.png" "$APPDIR/calibre.png"
+          else
+            echo "::warning::Icon not found; proceeding without setting a custom icon"
+          fi
 
-      # Optional: include README
-      cp README.md "$APPDIR/" || true
+          # Optional: include README
+          cp README.md "$APPDIR/" || true
 
-      echo "Contents of $APPDIR:"
-      ls -lah "$APPDIR"
-      echo "Contents of $APPDIR/usr/bin:"
-      ls -lah "$APPDIR/usr/bin"
+          echo "Contents of $APPDIR:"
+          ls -lah "$APPDIR"
+          echo "Contents of $APPDIR/usr/bin:"
+          ls -lah "$APPDIR/usr/bin"
 
-  - name: Get appimagetool
-    run: |
-      set -euxo pipefail
-      curl -L -o appimagetool-x86_64.AppImage https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
-      chmod +x appimagetool-x86_64.AppImage
+      - name: Get appimagetool
+        run: |
+          set -euxo pipefail
+          curl -L -o appimagetool-x86_64.AppImage https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
 
-  - name: Make AppImage
-    run: |
-      set -euxo pipefail
-      # Using Calibre.AppDir ensures output name base is 'Calibre'
-      ./appimagetool-x86_64.AppImage build/Calibre.AppDir
+      - name: Make AppImage
+        run: |
+          set -euxo pipefail
+          # Using Calibre.AppDir ensures output name base is 'Calibre'
+          ./appimagetool-x86_64.AppImage build/Calibre.AppDir
 
-  - name: List files and rename AppImage
-    id: rename_appimage
-    run: |
-      set -euxo pipefail
-      CALIBRE_VERSION='${{ steps.get_version.outputs.CALIBRE_VERSION }}'
-      SRC="Calibre-x86_64.AppImage"
-      if [ ! -f "$SRC" ]; then
-        echo "::error::Expected $SRC not found. Listing workspace:"
-        ls -lah
-        exit 1
-      fi
-      APPIMAGE_NAME="Calibre-$CALIBRE_VERSION-x86_64.AppImage"
-      MD5_NAME="$APPIMAGE_NAME.md5"
-      mv "$SRC" "$APPIMAGE_NAME"
-      md5sum "$APPIMAGE_NAME" > "$MD5_NAME"
-      ls -lah
-      echo "APPIMAGE_NAME=$APPIMAGE_NAME" >> $GITHUB_OUTPUT
-      echo "MD5_NAME=$MD5_NAME" >> $GITHUB_OUTPUT
+      - name: List files and rename AppImage
+        id: rename_appimage
+        run: |
+          set -euxo pipefail
+          CALIBRE_VERSION='${{ steps.get_version.outputs.CALIBRE_VERSION }}'
+          SRC="Calibre-x86_64.AppImage"
+          if [ ! -f "$SRC" ]; then
+            echo "::error::Expected $SRC not found. Listing workspace:"
+            ls -lah
+            exit 1
+          fi
+          APPIMAGE_NAME="Calibre-$CALIBRE_VERSION-x86_64.AppImage"
+          MD5_NAME="$APPIMAGE_NAME.md5"
+          mv "$SRC" "$APPIMAGE_NAME"
+          md5sum "$APPIMAGE_NAME" > "$MD5_NAME"
+          ls -lah
+          echo "APPIMAGE_NAME=$APPIMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "MD5_NAME=$MD5_NAME" >> $GITHUB_OUTPUT
 
-  - name: Create GitHub Release and Upload Assets
-    uses: softprops/action-gh-release@v2
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    with:
-      tag_name: v${{ steps.get_version.outputs.CALIBRE_VERSION }}
-      name: Calibre AppImage v${{ steps.get_version.outputs.CALIBRE_VERSION }}
-      body: |
-        Automated build of Calibre AppImage version ${{ steps.get_version.outputs.CALIBRE_VERSION }}.
-        Note: This is an unofficial build.
-      draft: false
-      prerelease: false
-      files: |
-        ${{ steps.rename_appimage.outputs.APPIMAGE_NAME }}
-        ${{ steps.rename_appimage.outputs.MD5_NAME }}
-
+      - name: Create GitHub Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.CALIBRE_VERSION }}
+          name: Calibre AppImage v${{ steps.get_version.outputs.CALIBRE_VERSION }}
+          body: |
+            Automated build of Calibre AppImage version ${{ steps.get_version.outputs.CALIBRE_VERSION }}.
+            Note: This is an unofficial build.
+          draft: false
+          prerelease: false
+          files: |
+            ${{ steps.rename_appimage.outputs.APPIMAGE_NAME }}
+            ${{ steps.rename_appimage.outputs.MD5_NAME }}
