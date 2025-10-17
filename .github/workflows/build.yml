@@ -137,8 +137,10 @@ jobs:
           tag_name: v${{ steps.get_version.outputs.CALIBRE_VERSION }}
           name: Calibre AppImage v${{ steps.get_version.outputs.CALIBRE_VERSION }}
           body: |
-            Automated build of Calibre AppImage version ${{ steps.get_version.outputs.CALIBRE_VERSION }}.
-            Note: This is an unofficial build.
+            Appimage for Calibre version ${{ steps.get_version.outputs.CALIBRE_VERSION }}.
+            [Changelog](https://calibre-ebook.com/whats-new)
+            Support Kushagra :
+            [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/karirakushagra)
           draft: false
           prerelease: false
           files: |
