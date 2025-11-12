@@ -1,5 +1,5 @@
 # Calibre Appimage
-    Calibre: 8.13.0
+    Calibre: 8.14.0
 
 If i fail to update the release, feel free to fork it and update the version number and you'll get the file in release section.
 
