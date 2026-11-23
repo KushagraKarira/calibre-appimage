@@ -1,0 +1,45 @@
+name: Check Calibre Update
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # Runs daily at 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Check latest Calibre release and update README
+        run: |
+          set -euxo pipefail
+
+          LATEST_TAG=$(curl -fsSL https://api.github.com/repos/kovidgoyal/calibre/releases/latest | jq -r '.tag_name')
+          LATEST_VERSION="${LATEST_TAG#v}"
+          CURRENT_VERSION=$(grep -oP "Calibre:\s*\K\S+" README.md)
+
+          if [ -z "$LATEST_VERSION" ] || [ "$LATEST_VERSION" = "null" ]; then
+            echo "::error::Failed to fetch latest Calibre version"
+            exit 1
+          fi
+
+          if [ "$LATEST_VERSION" = "$CURRENT_VERSION" ]; then
+            echo "Already on latest version ($CURRENT_VERSION)."
+            exit 0
+          fi
+
+          # Ensure the download tarball is live before updating README.md
+          DOWNLOAD_URL="https://download.calibre-ebook.com/$LATEST_VERSION/calibre-$LATEST_VERSION-x86_64.txz"
+          curl -fsIL "$DOWNLOAD_URL" > /dev/null
+
+          sed -i "s/Calibre:[[:space:]]*$CURRENT_VERSION/Calibre: $LATEST_VERSION/" README.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update Calibre version to $LATEST_VERSION"
+          git push
